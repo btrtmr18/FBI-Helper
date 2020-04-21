@@ -1111,7 +1111,7 @@ local suspect = {
 function main()
     if not isSampfuncsLoaded() or not isSampLoaded() then return end
         while not isSampAvailable() do wait(100) end
-				sampAddChatMessage("{FFFF00}[FBI-Helper] {FFFFFF}Скрипт версии "..script_version.." успешно запущен и готов к работе. Разработчик: Timur//.", 0x1284c4)
+				sampAddChatMessage("{FFFF00}[FBI-Helper] {FFFFFF}Скрипт версии 1.1 успешно запущен и готов к работе. Разработчик: Timur//.", 0x1284c4)
 				sampAddChatMessage("{FFFF00}[FBI-Helper] {FFFFFF}Для ознакомления с информацией и функционалом скрипта введите команду /fhelper.", 0x1284c4)
 
 				sampRegisterChatCommand("cuf", cmd_cuff) -- /cuff

@@ -1,17 +1,18 @@
 script_name('FBI-Helper')
 script_author('Timur//')
-script_version('1.1')
+script_version('1.2')
 
 require 'lib.moonloader'
 require 'lib.sampfuncs'
 local lsg, sf = pcall(require, 'sampfuncs')
 local lkey, key = pcall(require, 'vkeys')
 local imgui = require 'imgui'
+local inicfg = require "inicfg"
 encoding = require 'encoding'
 encoding.default = 'CP1251'
 u8 = encoding.UTF8
 lsampev, sampev = pcall(require, 'lib.samp.events')
-local dlstatus = require('moonloader').download_status
+local dlstatus = require("moonloader").download_status
 
 local main_window_state = imgui.ImBool(false)
 local text_buffer = imgui.ImBuffer(256)
@@ -1128,10 +1129,21 @@ function main()
 				sampRegisterChatCommand("issue", cmd_skip) -- /skip
 				sampRegisterChatCommand('cc', function() ClearChat() end)
 				sampRegisterChatCommand("fhelper", cmd_fhelper)
+				sampRegisterChatCommand("driver", cmd_takelic)
+				sampRegisterChatCommand("clear", cmd_clear)
+				sampRegisterChatCommand("pul", cmd_pull)
+				sampRegisterChatCommand("prava", cmd_prava)
 
 
         while true do
         wait(0)
+
+				if  not sampIsChatInputActive() and not sampIsDialogActive() then
+							if isKeyJustPressed(key.VK_END) then
+								sampSendChat("/me достал пульт управления шлагбаумом, нажал на одну из кнопок.")
+								sampSendChat("/open")
+							end
+				end
 
 				if main_window_state.v == false then
         imgui.Process = false
@@ -1206,6 +1218,8 @@ function main()
 					end
 				end
 
+
+
 			end
 		end
 
@@ -1235,6 +1249,21 @@ function main()
 			end
 		end
 
+		function cmd_takelic(param)
+		    id, pricina = string.match(param, "(.+) (.+)")
+		    if id ==nil or id == "" then
+		        sampAddChatMessage("{"..select_color.."}[FBI-Helper] {FFFFFF}Правильное использование команды - /driver [id] [причина].", script_color)
+		    else
+					lua_thread.create(function()
+		        sampSendChat("/do Встроенная камера в очках «Overseer» зафиксировала нарушение."); wait(500)
+						sampSendChat("/me достав КПК из кармана, разблокировал его и вошёл в систему."); wait(500)
+						sampSendChat("/me выполнив несколько операций, анулировал права у "..string.gsub(sampGetPlayerNickname(id),'_',' ').."."); wait(500)
+		        sampSendChat("/takelic "..id.." "..pricina); wait(500)
+						sampSendChat("/do Права аннулированы и отсутствуют в базе данных."); wait(500)
+		    end)
+			end
+		end
+
 		function cmd_arrest(param)
 			id = string.match(param, "(.+)")
 			if id ==nil or id == "" then
@@ -1255,7 +1284,7 @@ function main()
 			sampSendChat("/me достал удостоверение из кармана, после показал его."); sampSendChat("/anim 21")
 			wait(1500)
 			sampSendChat('/do Удостоверение: Федеральное Бюро Расследований.'); wait(500)
-			sampSendChat('/do Удостоверение: Сотрудник: Scott Andrew Ward | Должность: Head of Department.'); wait(500)
+			sampSendChat('/do Удостоверение: Сотрудник: Scott Ward | Должность: Head of Department.'); wait(500)
 			sampSendChat('/do Удостоверение: Личный номер: 19-055-75 | Пол сотрудника: Мужской.'); wait(500)
 		end)
 	end
@@ -1326,10 +1355,57 @@ function main()
 		end
 	end
 
+	function cmd_prava()
+		lua_thread.create(function()
+				sampSendChat("Вы арестованы и имеете право хранить молчание."); wait(2000)
+				sampSendChat("Всё, что вы скажете, может ужесточить наказание."); wait(2000)
+				sampSendChat("Кроме этого, вы имеете право воспользоваться услугами адвоката."); wait(2000)
+				sampSendChat("Если Вы не местный, то у Вас есть право на присутствие представителя Вашей страны."); wait(2000)
+				sampSendChat("Вы имеете право на совершение одного телефонного звонка.")
+	end)
+	end
+
+	function cmd_pull(param)
+	    id = string.match(param, "(.+)")
+	    if id ==nil or id == "" then
+	        sampAddChatMessage("{"..select_color.."}[FBI-Helper] {FFFFFF}Правильное использование команды - /pul [id].", script_color)
+	    else
+				lua_thread.create(function()
+					sampSendChat("/me уперевшись одной ногой на твердой поверхности, второй ногой проломил стекло автомобиля."); wait(500)
+	        sampSendChat("/me силой вытащил подозреваемого "..string.gsub(sampGetPlayerNickname(id),'_',' ').." через проломленное окно."); wait(500)
+					sampSendChat("/pull "..id); wait(500)
+	    end)
+		end
+	end
+
+	function cmd_clear(param)
+	    id = string.match(param, "(.+)")
+	    if id ==nil or id == "" then
+	        sampAddChatMessage("{"..select_color.."}[FBI-Helper] {FFFFFF}Правильное использование команды - /clear [id].", script_color)
+	    else
+				lua_thread.create(function()
+	        sampSendChat("/me достав КПК из кармана, разблокировал его и вошёл в систему."); wait(1500)
+					sampSendChat("/me перешел в раздел закрытия дел, попытался закрыть дело."); wait(1500)
+					sampSendChat("/do Мобильная база данных запросила подтверждение на совершение операции."); wait(500)
+					sampShowDialog(53, "Подтверждение снятия розыска", "{FFFFFF}Вы действительно хотите снять розыск с {FFA500}"..string.gsub(sampGetPlayerNickname(id),'_',' ').."{FFFFFF}?\n\n{ff0000}Примечание: снимать розыск преступникам разрешено только лидерам!", "Да", "Нет", 0)
+			while sampIsDialogActive(53) do wait(100) end
+			local result, button, _, input = sampHasDialogRespond(53)
+			if button == 1 then
+					sampSendChat("/me нажал на кнопку подтверждения операции, выключил мобильную базу и убрал её в карман."); wait(1500)
+					sampSendChat('/clear '..id); wait(500)
+					end
+					if button == 0 then
+					sampSendChat("/me нажал на кнопку отмены операции, выключил мобильную базу и убрал её в карман."); wait(500)
+					end
+		end)
+		end
+	end
+
 	function cmd_fhelper(arg)
 	    main_window_state.v = not main_window_state.v
 	    imgui.Process = main_window_state.v
 	end
+
 	-- ======================================================================
 
 	function IPC(id) -- аналог sampIsPlayerConnected()
@@ -1460,6 +1536,7 @@ function main()
 			imgui.Text(u8"/inc [id] - усадить человека в машину") -- простой текст внутри этого окна
 			imgui.Text(u8"/usus [id] - умный розыск") -- простой текст внутри этого окна
 			imgui.Text(u8"/sus [id] [кол-во звезд] [причина] - объявить человека в розыск") -- простой текст внутри этого окна
+			imgui.Text(u8"/pul [id] - вытащить человека из машины") -- простой текст внутри этого окна
 			imgui.Separator()
 			imgui.Text(u8"Команды для чата:")
 			imgui.Spacing()
@@ -1471,6 +1548,9 @@ function main()
 			imgui.Text(u8"/udost - предъявить удостоверение") -- простой текст внутри этого окна
 			imgui.Text(u8"/histid [id] - проверить историю имен по ID") -- простой текст внутри этого окна
 			imgui.Text(u8"/issue [id] - выдать пропуск в здание Мин.Внут.Дел") -- простой текст внутри этого окна
+			imgui.Text(u8"/driver [id] [причина] - лишить человека прав") -- простой текст внутри этого окна
+			imgui.Text(u8"/clear [id] - снять розыск") -- простой текст внутри этого окна
+			imgui.Text(u8"/prava - зачитать права при задержании") -- простой текст внутри этого окна
 			imgui.Text(u8"/cc - очистить чат") -- простой текст внутри этого окна
 			imgui.Separator()
 	  end
@@ -1478,7 +1558,7 @@ function main()
 			imgui.Text(u8"ГОРЯЧИЕ КЛАВИШИ СКРИПТА:")
 			imgui.Spacing()
 			imgui.Text(u8"END - управление шлагбаумом") -- простой текст внутри этого окна
-			imgui.Text(u8"Numpad 0 - кричалка при задержании [на улице | в машине]") -- простой текст внутри этого окна
+			imgui.Text(u8"Home - кричалка при задержании [на улице | в машине]") -- простой текст внутри этого окна
 			imgui.Separator()
 	  end
 		if selected == 3 then
@@ -1486,6 +1566,7 @@ function main()
         os.execute("start https://vk.com/id124779478")
     	end
 			imgui.Text(u8"Разработчик скрипта: Timur//.")
+			imgui.Text(u8"На данный момент Вы используете версию "..thisScript().version..".")
 			imgui.Text(u8"Скрипт разработан персонально для ... .")
 	  end
 	  imgui.EndChild()
@@ -1590,7 +1671,7 @@ function autoupdate(json_url, prefix, url)
             if updateversion ~= thisScript().version then
               lua_thread.create(function(prefix)
                 local dlstatus = require('moonloader').download_status
-                local color = -1
+                local color = 0x0080FF
                 sampAddChatMessage((prefix..'Обнаружено обновление. Пытаюсь обновиться c '..thisScript().version..' на '..updateversion), color)
                 wait(250)
                 downloadUrlToFile(updatelink, thisScript().path,
